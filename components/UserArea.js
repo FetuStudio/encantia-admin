@@ -141,7 +141,7 @@ export default function Navbar() {
             <div className="flex justify-between items-center mb-4">
                 <div>
                     <img
-                        src="https://images.encantia.lat/fetuteam.png"
+                        src="https://images.encantia.lat/fte.png"
                         alt="Logo"
                         className="h-16"
                     />
