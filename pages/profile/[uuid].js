@@ -80,40 +80,22 @@ export default function UserProfile() {
                         Inicio
                     </button>
                     <button
-                        onClick={() => router.push('/EventsArea')}  // Redirige a la página de eventos
+                        onClick={() => router.push('/notes')}  // Redirige a la página de eventos
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
                     >
-                        Eventos
+                        Notas
                     </button>
                     <button
-                        onClick={() => router.push('/profile')}  // Redirige al perfil del usuario
+                        onClick={() => router.push('/bdm')}  // Redirige al perfil del usuario
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
                     >
-                        Mi Perfil
+                        Buzon de mensajes
                     </button>
                     <button
-                        onClick={() => router.push('/chat')}  // Redirige al área de chat
+                        onClick={() => router.push('/advert')}  // Redirige al área de chat
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
                     >
-                        Chat
-                    </button>
-                    <button
-                        onClick={() => router.push('/libros')}  // Redirige a la página de libros
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                    >
-                        Libros
-                    </button>
-                    <button
-                        onClick={() => window.open("https://discord.gg/dxcX8S3mrF", "_blank")}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                    >
-                        Discord
-                    </button>
-                    <button
-                        onClick={() => router.push('/fg2')}  // Redirige a otra sección de la app
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                    >
-                        Fetu Games 2
+                        Advertencias
                     </button>
                 </div>
 
@@ -128,18 +110,6 @@ export default function UserProfile() {
                     {/* Menú desplegable */}
                     {menuOpen && (
                         <div className="absolute right-0 mt-2 bg-gray-800 text-white rounded-md shadow-lg w-40">
-                            <button
-                                onClick={() => router.push('/profile')}
-                                className="block px-4 py-2 text-sm hover:bg-gray-700"
-                            >
-                                Perfil
-                            </button>
-                            <button
-                                onClick={() => router.push('/settings')}
-                                className="block px-4 py-2 text-sm hover:bg-gray-700"
-                            >
-                                Configuración
-                            </button>
                             <button
                                 onClick={() => supabase.auth.signOut().then(() => router.push('/'))}
                                 className="block px-4 py-2 text-sm text-red-500 hover:bg-gray-700"
