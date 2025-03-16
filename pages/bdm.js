@@ -148,11 +148,11 @@ export default function Navbar() {
 
       {/* Título "MENSAJES" centrado debajo de los botones */}
       <div className="flex justify-center items-center mb-6 text-white font-bold text-3xl">
-      BUZON DE MENSAJES
+        BUZON DE MENSAJES
       </div>
 
       {/* Mostrar mensajes o el estado de carga */}
-      {loading && <div className="text-white">Estamos cargando tu buzon de mensajes...</div>}
+      {loading && <div className="text-white">Estamos cargando tu buzón de mensajes...</div>}
       {error && <div className="text-red-500">{error}</div>}
 
       {/* Mostrar los mensajes del usuario */}
@@ -195,6 +195,11 @@ export default function Navbar() {
           </div>
         </div>
       )}
+
+      {/* Pie de página */}
+      <div className="mt-8 p-4 bg-gray-900 text-center text-sm text-gray-400 fixed bottom-0 w-full">
+        <p>© 2025 Encantia. Todos los derechos reservados.</p>
+      </div>
     </div>
   );
 }
