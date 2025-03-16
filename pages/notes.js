@@ -31,7 +31,7 @@ export default function Navbar() {
           // Obtener las notas del usuario
           const { data: notesData, error: notesError } = await supabase
             .from("ntas")
-            .select("evau1, evau2, evau3, evau4, evau5, evaucat")
+            .select("evau1, evau2, evau3, evau4, evau5, nm, evaucat")
             .eq("user_id", user.id);
 
           if (notesError) {
@@ -91,6 +91,7 @@ export default function Navbar() {
     evau3: "Organización",
     evau4: "Trabajo en Equipo",
     evau5: "Experiencia",
+    nm: "Nota Media",
   };
 
   const getFilteredNotes = () => {
@@ -212,6 +213,12 @@ export default function Navbar() {
           </div>
         </div>
       )}
+
+      {/* Pie de página con el copyright */}
+      <div className="mt-8 p-4 bg-gray-900 text-center text-sm text-gray-400 fixed bottom-0 w-full">
+        <p>© 2025 Encantia. Todos los derechos reservados.</p>
+      </div>
     </div>
   );
 }
+
