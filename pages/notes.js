@@ -11,7 +11,7 @@ export default function Navbar() {
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState([]);
-  const [imageUrl, setImageUrl] = useState(null);  // Aquí se almacenará la URL de la imagen
+  const [imageUrl, setImageUrl] = useState(null);  
   const [userProfile, setUserProfile] = useState(null);
   const router = useRouter();
 
@@ -54,8 +54,7 @@ export default function Navbar() {
             setError("No se pudo obtener tu perfil.");
           } else {
             setUserProfile(profileData);
-            // Aseguramos que si el campo avatar_url está vacío, se utilice la imagen predeterminada.
-            const avatarUrl = profileData.avatar_url ? profileData.avatar_url : 'https://i.ibb.co/d0mWy0kP/perfildef.png';
+            const avatarUrl = profileData.avatar_url || 'https://i.ibb.co/d0mWy0kP/perfildef.png';
             setImageUrl(avatarUrl); // Asignamos la URL del avatar del perfil
           }
         } else {
@@ -65,7 +64,7 @@ export default function Navbar() {
         console.error("Error en la solicitud:", err.message);
         setError("Ocurrió un error al cargar la información. Por favor, intenta de nuevo.");
       } finally {
-        setLoading(false); // Finaliza el proceso de carga
+        setLoading(false); 
       }
     };
 
@@ -95,7 +94,9 @@ export default function Navbar() {
   };
 
   const getFilteredNotes = () => {
-    if (!userNotes) return null;
+    if (!userNotes) {
+      return <div className="text-white">No tienes notas registradas.</div>;
+    }
 
     if (!selectedCategory)
       return <div className="text-white">Selecciona una categoría para ver tus notas.</div>;
@@ -153,7 +154,7 @@ export default function Navbar() {
 
         <div className="relative">
           <img
-            src={imageUrl}  // Usamos la URL obtenida del perfil
+            src={imageUrl}  
             alt="Avatar"
             className="w-12 h-12 rounded-full cursor-pointer"
             onClick={toggleMenu}
@@ -161,6 +162,9 @@ export default function Navbar() {
           {showMenu && (
             <div className="absolute right-0 mt-2 w-48 bg-gray-800 text-white rounded-lg shadow-lg z-10">
               <ul className="py-2">
+                <li className="px-4 py-2 text-white cursor-pointer hover:bg-gray-700" onClick={() => router.push(`/profile/${userProfile.user_id}`)}>
+                  Ver Perfil
+                </li>
                 <li className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-700" onClick={handleLogout}>
                   Cerrar Sesión
                 </li>
@@ -221,4 +225,3 @@ export default function Navbar() {
     </div>
   );
 }
-
