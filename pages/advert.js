@@ -82,30 +82,42 @@ export default function Navbar() {
         </div>
 
         <div className="flex gap-4">
-          <button
-            onClick={() => router.push('/')}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-          >
-            Inicio
-          </button>
-          <button
-            onClick={() => router.push('/notes')}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-          >
-            Notas
-          </button>
-          <button
-            onClick={() => router.push('/bdm')}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-          >
-            Buzón de mensajes
-          </button>
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-            onClick={() => router.push('/advert')}
-          >
-            Advertencias
-          </button>
+        <button
+                        onClick={() => router.push("/")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Inicio
+                    </button>      
+                    <button
+                        onClick={() => router.push("/notes")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Notas
+                    </button> 
+                    <button
+                        onClick={() => router.push("/bdm")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Buzon de mensajes
+                    </button> 
+                    <button
+                        onClick={() => router.push("/advert")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Advertencias
+                    </button> 
+                    <button
+                        onClick={() => router.push("/projects")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Proyectos
+                    </button> 
+                    <button
+                        onClick={() => router.push("/cprojects")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Crear Proyectos
+                    </button> 
         </div>
 
         {/* Foto de perfil */}
@@ -122,12 +134,6 @@ export default function Navbar() {
             {showMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-gray-800 text-white rounded-lg shadow-lg z-10">
                 <ul className="py-2">
-                   <li
-                     className="px-4 py-2 text-white cursor-pointer hover:bg-gray-700"
-                     onClick={() => router.push(`/profile/${userProfile.user_id}`)}
-                   >
-                     Ver perfil
-                   </li>
                   <li
                     className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-700"
                     onClick={handleLogout}
