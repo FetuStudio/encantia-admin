@@ -90,7 +90,7 @@ export default function Navbar() {
                                 <ul className="py-2">
                                     <li
                                         className="px-4 py-2 text-white cursor-pointer hover:bg-gray-700"
-                                        onClick={() => router.push(`/perfil/${userProfile.user_id}`)}
+                                        onClick={() => router.push(`/profile/${userProfile.user_id}`)}
                                     >
                                         Ver perfil
                                     </li>
@@ -121,7 +121,7 @@ export default function Navbar() {
                                     <div>
                                         <h3 className="text-xl font-semibold">{user.name}</h3>
                                         <button
-                                            onClick={() => router.push(`/perfil/${user.user_id}`)}
+                                            onClick={() => router.push(`/profile/${user.user_id}`)}
                                             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
                                         >
                                             Ver perfil
@@ -167,4 +167,3 @@ export default function Navbar() {
         </div>
     );
 }
-
