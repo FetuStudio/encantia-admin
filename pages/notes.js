@@ -13,6 +13,7 @@ export default function Navbar() {
   const [categories, setCategories] = useState([]);
   const [imageUrl, setImageUrl] = useState(null);  
   const [userProfile, setUserProfile] = useState(null);
+  const [userRole, setUserRole] = useState(null); // Estado para almacenar el rol del usuario
   const router = useRouter();
 
   // Función para obtener las notas y perfil del usuario
@@ -56,6 +57,7 @@ export default function Navbar() {
             setUserProfile(profileData);
             const avatarUrl = profileData.avatar_url || 'https://i.ibb.co/d0mWy0kP/perfildef.png';
             setImageUrl(avatarUrl); // Asignamos la URL del avatar del perfil
+            setUserRole(profileData.role); // Guardamos el rol del usuario
           }
         } else {
           setError("No hay usuario autenticado.");
@@ -138,18 +140,42 @@ export default function Navbar() {
         </div>
 
         <div className="flex gap-4">
-          <button onClick={() => router.push('/')} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors">
-            Inicio
-          </button>
-          <button onClick={() => router.push('/notes')} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors">
-            Notas
-          </button>
-          <button onClick={() => router.push('/bdm')} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors">
-            Buzón de Mensajes
-          </button>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors" onClick={() => router.push('/advert')}>
-            Advertencias
-          </button>
+        <button
+                        onClick={() => router.push("/")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Inicio
+                    </button>      
+                    <button
+                        onClick={() => router.push("/notes")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Notas
+                    </button> 
+                    <button
+                        onClick={() => router.push("/bdm")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Buzon de mensajes
+                    </button> 
+                    <button
+                        onClick={() => router.push("/advert")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Advertencias
+                    </button> 
+                    <button
+                        onClick={() => router.push("/projects")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Proyectos
+                    </button> 
+                    <button
+                        onClick={() => router.push("/cprojects")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Crear Proyectos
+                    </button> 
         </div>
 
         <div className="relative">
