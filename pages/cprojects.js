@@ -120,7 +120,37 @@ export default function Navbar() {
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
                     >
                         Inicio
-                    </button>
+                    </button>      
+                    <button
+                        onClick={() => router.push("/notes")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Notas
+                    </button> 
+                    <button
+                        onClick={() => router.push("/bdm")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Buzon de mensajes
+                    </button> 
+                    <button
+                        onClick={() => router.push("/advert")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Advertencias
+                    </button> 
+                    <button
+                        onClick={() => router.push("/projects")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Proyectos
+                    </button> 
+                    <button
+                        onClick={() => router.push("/cprojects")}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                    >
+                        Crear Proyectos
+                    </button> 
                 </div>
 
                 {userProfile && (
@@ -201,3 +231,5 @@ export default function Navbar() {
         </div>
     );
 }
+
+
