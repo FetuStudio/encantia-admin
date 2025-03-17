@@ -54,6 +54,12 @@ export default function Navbar() {
         { name: 'Advertencias', url: '/advert' },
     ];
 
+    // Dividir los usuarios en columnas de máximo 7
+    const columns = [];
+    for (let i = 0; i < users.length; i += 7) {
+        columns.push(users.slice(i, i + 7));
+    }
+
     return (
         <div className="flex flex-col h-screen p-4 bg-gray-900 text-white relative">
             <div className="flex justify-between items-center mb-4">
@@ -84,7 +90,7 @@ export default function Navbar() {
                                 <ul className="py-2">
                                     <li
                                         className="px-4 py-2 text-white cursor-pointer hover:bg-gray-700"
-                                        onClick={() => router.push(`/profile/${userProfile.user_id}`)}
+                                        onClick={() => router.push(`/perfil/${userProfile.user_id}`)}
                                     >
                                         Ver perfil
                                     </li>
@@ -102,23 +108,27 @@ export default function Navbar() {
             </div>
 
             {users.length > 0 ? (
-                <div className="flex flex-col gap-6 mt-8">
-                    {users.map((user, index) => (
-                        <div key={index} className="flex items-center space-x-4">
-                            <img
-                                src={user.avatar_url || 'https://i.ibb.co/d0mWy0kP/perfildef.png'}
-                                alt="Avatar"
-                                className="w-16 h-16 rounded-full"
-                            />
-                            <div>
-                                <h3 className="text-xl font-semibold">{user.name}</h3>
-                                <button
-                                    onClick={() => router.push(`/profile/${user.user_id}`)}
-                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                                >
-                                    Ver perfil
-                                </button>
-                            </div>
+                <div className="flex gap-8 mt-8">
+                    {columns.map((column, columnIndex) => (
+                        <div key={columnIndex} className="flex flex-col gap-6">
+                            {column.map((user, index) => (
+                                <div key={index} className="flex items-center space-x-4">
+                                    <img
+                                        src={user.avatar_url || 'https://i.ibb.co/d0mWy0kP/perfildef.png'}
+                                        alt="Avatar"
+                                        className="w-16 h-16 rounded-full"
+                                    />
+                                    <div>
+                                        <h3 className="text-xl font-semibold">{user.name}</h3>
+                                        <button
+                                            onClick={() => router.push(`/perfil/${user.user_id}`)}
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                                        >
+                                            Ver perfil
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ))}
                 </div>
@@ -157,3 +167,4 @@ export default function Navbar() {
         </div>
     );
 }
+
