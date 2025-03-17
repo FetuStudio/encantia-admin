@@ -161,6 +161,10 @@ export default function Navbar() {
                     </div>
                 </div>
             )}
+
+            <div className="mt-8 p-4 bg-gray-900 text-center text-sm text-gray-400 fixed bottom-0 w-full">
+                <p>© 2025 Encantia. Todos los derechos reservados.</p>
+            </div>
         </div>
     );
 }
