@@ -11,24 +11,21 @@ const Perfil = () => {
     const [avatarUrl, setAvatarUrl] = useState(""); 
     const [userEmail, setUserEmail] = useState(""); 
     const [profileExists, setProfileExists] = useState(true); 
-    const [loading, setLoading] = useState(true); // Se actualiza a 'true' en el segundo código
+    const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(""); 
     const [profileSaved, setProfileSaved] = useState(false); 
-    const [users, setUsers] = useState([]);  // Nuevo estado para almacenar los usuarios
+    const [users, setUsers] = useState([]); 
     
-    // Agregado desde el segundo bloque
-    const [followers, setFollowers] = useState([]); // Estado para almacenar los seguidores
-    const [newDescription, setNewDescription] = useState(""); // Estado para manejar la nueva descripción
-    const [isEditing, setIsEditing] = useState(false); // Controla si el usuario está editando la descripción
-    const [followersCount, setFollowersCount] = useState(0); // Contador de seguidores
-    const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false); // Estado para abrir/cerrar el modal
-    
+    const [followers, setFollowers] = useState([]); 
+    const [newDescription, setNewDescription] = useState(""); 
+    const [isEditing, setIsEditing] = useState(false); 
+    const [followersCount, setFollowersCount] = useState(0); 
+    const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false); // Estado para verificar si ya sigues al usuario
 
-    // Usamos useRouter para capturar el parámetro 'uuid' desde la URL
     const router = useRouter();
-    const { uuid } = router.query; // Capturamos el parámetro 'uuid' desde la URL
+    const { uuid } = router.query; 
 
-    // Verificamos si el usuario está viendo su propio perfil
     const [currentUser, setCurrentUser] = useState(null);
 
     useEffect(() => {
@@ -44,16 +41,14 @@ const Perfil = () => {
         fetchUserProfile();
     }, []);
 
-    // useEffect que se ejecuta cuando el componente se monta
     useEffect(() => {
         if (!uuid) return;
 
         const fetchProfile = async () => {
             try {
-                // Obtener el perfil del usuario
                 const { data, error } = await supabase
                     .from("profiles")
-                    .select("*, role") // Aseguramos que también estamos trayendo la columna 'role'
+                    .select("*, role")
                     .eq("user_id", uuid)
                     .single();
 
@@ -63,8 +58,7 @@ const Perfil = () => {
                 }
 
                 setUserProfile(data);
-                setNewDescription(data.description || ""); // Cargamos la descripción actual en el estado
-
+                setNewDescription(data.description || ""); 
                 setLoading(false);
             } catch (error) {
                 console.error("Error general:", error);
@@ -76,13 +70,11 @@ const Perfil = () => {
         fetchProfile();
     }, [uuid]);
 
-    // useEffect que obtiene la lista de seguidores
     useEffect(() => {
         if (!uuid || !currentUser) return;
 
         const fetchFollowers = async () => {
             try {
-                // Obtener los seguidores de este usuario
                 const { data: followersData, error } = await supabase
                     .from("followers")
                     .select("follower_id")
@@ -95,7 +87,6 @@ const Perfil = () => {
 
                 setFollowersCount(followersData.length);
 
-                // Obtener los detalles de los seguidores (nombre y avatar_url)
                 const followersIds = followersData.map((follower) => follower.follower_id);
                 const { data: followersDetails, error: followersError } = await supabase
                     .from("profiles")
@@ -117,12 +108,35 @@ const Perfil = () => {
         fetchFollowers();
     }, [uuid, currentUser]);
 
-    // Función para guardar la nueva descripción
+    useEffect(() => {
+        if (!currentUser || !userProfile) return;
+
+        const checkIfFollowing = async () => {
+            const { data, error } = await supabase
+                .from("followers")
+                .select("*")
+                .eq("follower_id", currentUser.id)
+                .eq("followed_id", uuid);
+
+            if (error) {
+                console.error("Error al verificar seguimiento:", error.message);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                setIsFollowing(true); // El usuario ya sigue al perfil
+            } else {
+                setIsFollowing(false); // El usuario no sigue al perfil
+            }
+        };
+
+        checkIfFollowing();
+    }, [currentUser, userProfile, uuid]);
+
     const handleSaveDescription = async () => {
         if (!currentUser || !newDescription) return;
 
         try {
-            // Actualizamos la descripción en la base de datos
             const { data, error } = await supabase
                 .from("profiles")
                 .update({ description: newDescription })
@@ -134,27 +148,49 @@ const Perfil = () => {
                 return;
             }
 
-            // Actualizamos el estado para reflejar los cambios
             setUserProfile((prevProfile) => ({
                 ...prevProfile,
-                description: newDescription, // Actualizamos la descripción en el estado
+                description: newDescription,
             }));
 
-            setIsEditing(false); // Desactivamos el modo de edición
+            setIsEditing(false);
         } catch (error) {
             console.error("Error al guardar descripción:", error);
             setErrorMessage("Hubo un error al guardar la descripción.");
         }
     };
 
-    // Abrir el modal de seguidores
     const openFollowersModal = () => {
         setIsFollowersModalOpen(true);
     };
 
-    // Cerrar el modal de seguidores
     const closeFollowersModal = () => {
         setIsFollowersModalOpen(false);
+    };
+
+    const handleFollow = async () => {
+        if (!currentUser || !uuid) return;
+
+        try {
+            const { data, error } = await supabase
+                .from("followers")
+                .insert([
+                    {
+                        follower_id: currentUser.id,
+                        followed_id: uuid,
+                    },
+                ]);
+
+            if (error) {
+                console.error("Error al seguir:", error.message);
+                return;
+            }
+
+            setIsFollowing(true); // Ahora el usuario sigue al perfil
+            setFollowersCount(followersCount + 1); // Aumentar el contador de seguidores
+        } catch (error) {
+            console.error("Error al seguir:", error);
+        }
     };
 
     if (loading) return <div>Cargando...</div>;
@@ -164,7 +200,6 @@ const Perfil = () => {
 
     return (
         <div className="flex flex-col h-screen bg-gray-900 text-white">
-            {/* Barra de navegación superior */}
             <div className="flex justify-between items-center p-4 bg-gray-900">
                 <div>
                     <img
@@ -173,7 +208,6 @@ const Perfil = () => {
                         className="h-16"
                     />
                 </div>
-
                 <div className="flex gap-4">
                     <button
                         onClick={() => router.push("/")}
@@ -202,7 +236,6 @@ const Perfil = () => {
                 </div>
             </div>
 
-            {/* Contenido principal del perfil */}
             <div className="flex flex-col items-center mt-10 p-6 bg-gray-900 rounded-lg">
                 <img
                     src={userProfile.avatar_url || "https://i.ibb.co/d0mWy0kP/perfildef.png"}
@@ -210,13 +243,10 @@ const Perfil = () => {
                     className="w-32 h-32 rounded-full mb-4"
                 />
                 <h1 className="text-3xl font-semibold">{userProfile.name}</h1>
-
-                {/* Mostrar el rol del usuario */}
                 <div className="mt-4 text-lg text-gray-300">
                     <p><strong>Rol:</strong> {userProfile.role || "Sin rol asignado"}</p>
                 </div>
 
-                {/* Mostrar la descripción */}
                 <div className="mt-4 text-lg text-gray-300">
                     {!isEditing ? (
                         <p>{userProfile.description || "Este usuario no ha agregado una descripción."}</p>
@@ -230,7 +260,6 @@ const Perfil = () => {
                     )}
                 </div>
 
-                {/* Botón de editar descripción */}
                 {isOwnProfile && !isEditing && (
                     <button
                         onClick={() => setIsEditing(true)}
@@ -240,7 +269,6 @@ const Perfil = () => {
                     </button>
                 )}
 
-                {/* Botón de guardar descripción */}
                 {isOwnProfile && isEditing && (
                     <div className="flex gap-4 mt-4">
                         <button
@@ -258,7 +286,15 @@ const Perfil = () => {
                     </div>
                 )}
 
-                {/* Contador de seguidores */}
+                {!isOwnProfile && !isFollowing && (
+                    <button
+                        onClick={handleFollow}
+                        className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400"
+                    >
+                        Seguir
+                    </button>
+                )}
+
                 <div className="mt-6">
                     <p className="text-lg font-semibold text-gray-300">
                         <span
@@ -270,7 +306,6 @@ const Perfil = () => {
                     </p>
                 </div>
 
-                {/* Modal de seguidores */}
                 {isFollowersModalOpen && (
                     <div
                         className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center"
@@ -278,7 +313,7 @@ const Perfil = () => {
                     >
                         <div
                             className="bg-gray-900 p-6 rounded-lg w-96"
-                            onClick={(e) => e.stopPropagation()} // Evita que se cierre el modal al hacer clic dentro
+                            onClick={(e) => e.stopPropagation()}
                         >
                             <h2 className="text-xl font-semibold text-white mb-4">Seguidores</h2>
                             <ul className="space-y-4">
@@ -304,7 +339,6 @@ const Perfil = () => {
                 )}
             </div>
 
-            {/* Pie de página con el copyright al final */}
             <div className="mt-8 p-4 bg-gray-900 text-center text-sm text-gray-400 fixed bottom-0 w-full">
                 <p>© 2025 Encantia. Todos los derechos reservados.</p>
             </div>
@@ -313,4 +347,3 @@ const Perfil = () => {
 };
 
 export default Perfil;
-
