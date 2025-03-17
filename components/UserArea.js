@@ -3,19 +3,19 @@ import { supabase } from "../utils/supabaseClient";
 import { useRouter } from "next/router";
 
 export default function Navbar() {
-    const [role, setRole] = useState(""); // Estado para almacenar el rol del usuario
+    const [role, setRole] = useState("");
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [userProfile, setUserProfile] = useState(null);
-    const [username, setUsername] = useState("");
-    const [avatarUrl, setAvatarUrl] = useState("");
-    const [userEmail, setUserEmail] = useState("");
-    const [profileExists, setProfileExists] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const [profileSaved, setProfileSaved] = useState(false);
-    const [users, setUsers] = useState([]);
-    
+    const [username, setUsername] = useState(""); 
+    const [avatarUrl, setAvatarUrl] = useState(""); 
+    const [userEmail, setUserEmail] = useState(""); 
+    const [profileExists, setProfileExists] = useState(true); 
+    const [loading, setLoading] = useState(false); 
+    const [errorMessage, setErrorMessage] = useState(""); 
+    const [profileSaved, setProfileSaved] = useState(false); 
+    const [users, setUsers] = useState([]);  
+
     const router = useRouter();
 
     const fetchUserProfile = useCallback(async () => {
@@ -33,9 +33,6 @@ export default function Navbar() {
             setUserEmail(profileData.email);
             setUsername(profileData.name || '');
             setAvatarUrl(profileData.avatar_url || '');
-
-            // Establecer el rol del usuario
-            setRole(profileData.role || ''); // Suponiendo que el campo 'role' se encuentra en 'profiles'
         }
 
         const { data: allUsers } = await supabase
@@ -56,6 +53,7 @@ export default function Navbar() {
         { name: 'Buzón de mensajes', url: '/bdm' },
         { name: 'Advertencias', url: '/advert' },
         { name: 'Proyectos', url: '/projects' },
+        { name: 'Crear Proyectos', url: '/cprojects' },
     ];
 
     // Dividir los usuarios en columnas de máximo 7
@@ -79,15 +77,6 @@ export default function Navbar() {
                             {button.name}
                         </button>
                     ))}
-                    {/* Mostrar el botón "Crear Proyecto" solo si el rol es Owner+ */}
-                    {role === 'Owner+' && (
-                        <button
-                            onClick={() => router.push("/crear-proyecto")}
-                            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-400 transition-colors"
-                        >
-                            Crear Proyecto
-                        </button>
-                    )}
                 </div>
 
                 {userProfile && (
@@ -180,4 +169,3 @@ export default function Navbar() {
         </div>
     );
 }
-
