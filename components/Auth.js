@@ -9,6 +9,7 @@ export default function Auth() {
     const [errorMessage, setErrorMessage] = useState(null); 
     const [loading, setLoading] = useState(false);
     const [isLoadingGifVisible, setIsLoadingGifVisible] = useState(false); // Estado para mostrar el gif de carga
+    const [passwordVisible, setPasswordVisible] = useState(false); // Estado para mostrar/ocultar la contraseña
 
     const dominiosRestringidos = ['gmail.com', 'outlook.com', 'outlook.es', 'hotmail.com'];
 
@@ -104,7 +105,7 @@ export default function Auth() {
                     <label htmlFor="password" className="text-white w-full block text-sm">Contraseña</label>
                     <div className="flex items-center w-full">
                         <input
-                            type="password" 
+                            type={passwordVisible ? "text" : "password"} // Cambia el tipo dependiendo del estado
                             name="password"
                             id="password"
                             className="p-2 border border-gray-600 w-full rounded bg-gray-700 text-white placeholder-gray-400"
@@ -117,6 +118,26 @@ export default function Auth() {
                             alt="Contraseña icono" 
                             className="w-6 h-6 ml-2"
                         />
+                        {/* Icono del ojo para mostrar/ocultar la contraseña */}
+                        <button
+                            type="button"
+                            className="ml-2 text-white"
+                            onClick={() => setPasswordVisible(!passwordVisible)}
+                        >
+                            {passwordVisible ? (
+                                <img 
+                                    src="https://images.encantia.lat/upass.png" 
+                                    alt="Ocultar contraseña" 
+                                    className="w-6 h-6"
+                                />
+                            ) : (
+                                <img 
+                                    src="https://images.encantia.lat/vpass.png" 
+                                    alt="Mostrar contraseña" 
+                                    className="w-6 h-6"
+                                />
+                            )}
+                        </button>
                     </div>
                 </div>
 
