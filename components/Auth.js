@@ -42,7 +42,7 @@ export default function Auth() {
 
             // Mostrar el GIF durante 3 segundos antes de redirigir
             setTimeout(() => {
-                // Redirigir a la página 'userarea'
+                // Redirigir a la página principal "/"
                 router.push('/');
             }, 3000); // 3 segundos
         } catch (e) {
@@ -79,44 +79,61 @@ export default function Auth() {
                 </div>
                 <h1 className="text-center text-white text-2xl">Iniciar sesión</h1>
 
+                {/* Correo electrónico con imagen a la derecha dentro del formulario */}
                 <div className="field mt-4">
                     <label htmlFor="email" className="text-white w-full block text-sm">Correo electrónico</label>
-                    <input
-                        type="email"
-                        name="email"
-                        className="p-2 border border-gray-600 w-full rounded bg-gray-700 text-white placeholder-gray-400"
-                        onChange={(e) => setEmail(e.target.value)}
-                        value={email}
-                        placeholder="Correo electrónico"
-                    />
+                    <div className="flex items-center w-full">
+                        <input
+                            type="email"
+                            name="email"
+                            className="p-2 border border-gray-600 w-full rounded bg-gray-700 text-white placeholder-gray-400"
+                            onChange={(e) => setEmail(e.target.value)}
+                            value={email}
+                            placeholder="Correo electrónico"
+                        />
+                        <img 
+                            src="https://images.encantia.lat/email.png" 
+                            alt="Correo electrónico icono" 
+                            className="w-6 h-6 ml-2"
+                        />
+                    </div>
                 </div>
 
+                {/* Contraseña con imagen a la derecha dentro del formulario */}
                 <div className="field mt-4">
                     <label htmlFor="password" className="text-white w-full block text-sm">Contraseña</label>
-                    <input
-                        type="password" 
-                        name="password"
-                        id="password"
-                        className="p-2 border border-gray-600 w-full rounded bg-gray-700 text-white placeholder-gray-400"
-                        onChange={(e) => setPassword(e.target.value)}
-                        value={password}
-                        placeholder="Contraseña"
-                    />
+                    <div className="flex items-center w-full">
+                        <input
+                            type="password" 
+                            name="password"
+                            id="password"
+                            className="p-2 border border-gray-600 w-full rounded bg-gray-700 text-white placeholder-gray-400"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                            placeholder="Contraseña"
+                        />
+                        <img 
+                            src="https://images.encantia.lat/password.png" 
+                            alt="Contraseña icono" 
+                            className="w-6 h-6 ml-2"
+                        />
+                    </div>
                 </div>
 
                 <button
-                    className={`border p-2 w-full mt-5 rounded ${loading ? 'bg-gray-500' : 'bg-blue-600'} text-white`}
+                    className="border p-2 w-full mt-5 rounded bg-blue-600 text-white relative"
                     onClick={handleSignIn}
                     disabled={loading}
                 >
-                    {loading ? (
+                    {/* Mostrar el texto del botón o el gif de carga */}
+                    {!loading ? 'Iniciar sesión' : ' '}
+                    {/* GIF de carga dentro del botón */}
+                    {loading && (
                         <img 
                             src="https://images.encantia.lat/loading.gif" 
                             alt="Cargando..."
-                            className="h-10 mx-auto"
+                            className="absolute inset-0 w-6 h-6 m-auto"
                         />
-                    ) : (
-                        'Iniciar sesión'
                     )}
                 </button>
 
