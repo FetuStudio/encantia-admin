@@ -129,7 +129,7 @@ export default function Navbar() {
     evau4: "Trabajo en Equipo",
     evau5: "Experiencia",
     nm: "Nota Media",
-    urod: "Resultado Fina (Ascender o Descender)",
+    urod: "Resultado Final (Ascender o Descender)",
   };
 
   const getFilteredNotes = () => {
