@@ -312,22 +312,24 @@ const Perfil = () => {
                         onClick={closeFollowersModal}
                     >
                         <div
-                            className="bg-gray-900 p-6 rounded-lg w-96"
+                            className="bg-gray-900 p-6 rounded-lg w-96 max-h-[70vh] flex flex-col"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <h2 className="text-xl font-semibold text-white mb-4">Seguidores</h2>
-                            <ul className="space-y-4">
-                                {followers.map((follower, index) => (
-                                    <li key={index} className="flex items-center gap-3">
-                                        <img
-                                            src={follower.avatar_url || "https://i.ibb.co/d0mWy0kP/perfildef.png"}
-                                            alt={follower.name}
-                                            className="w-12 h-12 rounded-full"
-                                        />
-                                        <span className="text-white">{follower.name}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                            <div className="overflow-y-auto max-h-[60vh] scrollbar-thin scrollbar-thumb-blue-800 scrollbar-track-transparent">
+                                <ul className="space-y-4">
+                                    {followers.map((follower, index) => (
+                                        <li key={index} className="flex items-center gap-3">
+                                            <img
+                                                src={follower.avatar_url || "https://i.ibb.co/d0mWy0kP/perfildef.png"}
+                                                alt={follower.name}
+                                                className="w-12 h-12 rounded-full"
+                                            />
+                                            <span className="text-white">{follower.name}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                             <button
                                 onClick={closeFollowersModal}
                                 className="mt-4 w-full px-4 py-2 bg-gray-600 text-white rounded-lg"
