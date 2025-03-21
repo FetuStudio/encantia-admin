@@ -164,7 +164,7 @@ export default function Navbar() {
             )}
 
             <div className="mt-8 p-4 bg-gray-900 text-center text-sm text-gray-400 fixed bottom-0 w-full">
-                <p>© 2025 Encantia. Todos los derechos reservados.</p>
+            <p>© 2025 by Encantia is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="noopener noreferrer">CC BY-NC-ND 4.0</a>.</p>
             </div>
         </div>
     );
