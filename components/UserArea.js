@@ -38,11 +38,17 @@ export default function Navbar() {
         { icon: "https://images.encantia.lat/home.png", name: "Inicio", url: '/' },
         { icon: "https://images.encantia.lat/mensaje.png", name: "Mensajes", url: '/bdm' },
         { icon: "https://images.encantia.lat/notas.png", name: "Notas", url: '/notes' },
-        { icon: "https://images.encantia.lat/adv.png", name: "Advertencias", url: '/advert' }
+        { icon: "https://images.encantia.lat/adv.png", name: "Advertencias", url: '/advert' },
+        { icon: "https://images.encantia.lat/chat.png", name: "Chat", url: '/chat' }
     ];
 
     return (
         <div className="bg-gray-900 min-h-screen">
+            {/* Texto de "Inicio" encima del navbar, con margen desde la parte superior */}
+            <div className="absolute top-209 left-1/2 transform -translate-x-1/2 text-white font-bold text-sm">
+                Inicio
+            </div>
+
             {/* Navbar de abajo */}
             <div className="fixed bottom-3 left-1/2 transform -translate-x-1/2 flex items-center bg-gray-900 p-2 rounded-full shadow-lg space-x-4 w-max">
                 {/* Logo a la izquierda en el navbar inferior */}
