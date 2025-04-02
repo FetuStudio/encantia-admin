@@ -1,26 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "../utils/supabaseClient";
 import { useRouter } from "next/router";
+import { supabase } from "../utils/supabaseClient";
 
 export default function Navbar() {
-    const [role, setRole] = useState("");
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const [showMenu, setShowMenu] = useState(false);
     const [userProfile, setUserProfile] = useState(null);
-    const [username, setUsername] = useState(""); 
-    const [avatarUrl, setAvatarUrl] = useState(""); 
-    const [userEmail, setUserEmail] = useState(""); 
-    const [profileExists, setProfileExists] = useState(true); 
-    const [loading, setLoading] = useState(false); 
-    const [errorMessage, setErrorMessage] = useState(""); 
-    const [profileSaved, setProfileSaved] = useState(false); 
-    const [users, setUsers] = useState([]);  
-
+    const [users, setUsers] = useState([]); // Add users state here
     const router = useRouter();
 
     const fetchUserProfile = useCallback(async () => {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        if (authError || !user) return;
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) return;
 
         const { data: profileData } = await supabase
             .from('profiles')
@@ -28,143 +17,101 @@ export default function Navbar() {
             .eq('email', user.email)
             .single();
 
-        if (profileData) {
-            setUserProfile(profileData);
-            setUserEmail(profileData.email);
-            setUsername(profileData.name || '');
-            setAvatarUrl(profileData.avatar_url || '');
+        if (profileData) setUserProfile(profileData);
+    }, []);
+
+    const fetchUsers = useCallback(async () => {
+        const { data, error } = await supabase.from('profiles').select('*');
+        if (error) {
+            console.error('Error fetching users:', error);
+        } else {
+            setUsers(data); // Set users data here
         }
-
-        const { data: allUsers } = await supabase
-            .from('profiles')
-            .select('name, avatar_url, email, user_id')
-            .neq('email', user.email);
-
-        if (allUsers) setUsers(allUsers);
     }, []);
 
     useEffect(() => {
         fetchUserProfile();
-    }, [fetchUserProfile]);
+        fetchUsers(); // Fetch users when the component mounts
+    }, [fetchUserProfile, fetchUsers]);
 
     const navButtons = [
-        { name: 'Inicio', url: '/' },
-        { name: 'Notas', url: '/notes' },
-        { name: 'Buzón de mensajes', url: '/bdm' },
-        { name: 'Advertencias', url: '/advert' },
-        { name: 'Proyectos', url: '/projects' },
-        { name: 'Crear Proyectos', url: '/cprojects' },
+        { icon: "https://images.encantia.lat/home.png", name: "Inicio", url: '/' },
+        { icon: "https://images.encantia.lat/mensaje.png", name: "Mensajes", url: '/bdm' },
+        { icon: "https://images.encantia.lat/notas.png", name: "Notas", url: '/notes' },
+        { icon: "https://images.encantia.lat/adv.png", name: "Advertencias", url: '/advert' }
     ];
 
-    // Dividir los usuarios en columnas de máximo 7
-    const columns = [];
-    for (let i = 0; i < users.length; i += 7) {
-        columns.push(users.slice(i, i + 7));
-    }
-
     return (
-        <div className="flex flex-col h-screen p-4 bg-gray-900 text-white relative">
-            <div className="flex justify-between items-center mb-4">
-                <img src="https://images.encantia.lat/encantia-logo-2025.webp" alt="Logo" className="h-16" />
-                
-                <div className="flex gap-4">
-                    {navButtons.map((button, index) => (
-                        <button
-                            key={index}
-                            onClick={() => router.push(button.url)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                        >
-                            {button.name}
-                        </button>
-                    ))}
-                </div>
+        <div className="bg-gray-900 min-h-screen">
+            {/* Navbar de abajo */}
+            <div className="fixed bottom-3 left-1/2 transform -translate-x-1/2 flex items-center bg-gray-900 p-2 rounded-full shadow-lg space-x-4 w-max">
+                {/* Logo a la izquierda en el navbar inferior */}
+                <img
+                    src="https://images.encantia.lat/encantia-logo-2025.webp" // Cambia por la URL de tu logo
+                    alt="Logo"
+                    className="h-13 w-auto" // Tamaño reducido para el logo
+                />
 
+                {/* Botones de navegación */}
+                {navButtons.map((button, index) => (
+                    <div key={index} className="relative group">
+                        <button 
+                            onClick={() => router.push(button.url)}
+                            className="p-2 rounded-full bg-gray-800 text-white text-xl transition-transform transform group-hover:scale-110"
+                        >
+                            <img src={button.icon} alt={button.name} className="w-8 h-8" />
+                        </button>
+                        <span className="absolute bottom-14 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-gray-700 text-white text-xs rounded px-2 py-1 transition-opacity">
+                            {button.name}
+                        </span>
+                    </div>
+                ))}
+
+                {/* Avatar del usuario */}
                 {userProfile && (
-                    <div className="relative">
+                    <button onClick={() => router.push(`/profile/${userProfile.user_id}`)} className="p-2 rounded-full bg-gray-800 text-white text-xl transition-transform transform hover:scale-110">
                         <img
                             src={userProfile.avatar_url || 'https://i.ibb.co/d0mWy0kP/perfildef.png'}
                             alt="Avatar"
-                            className="w-12 h-12 rounded-full cursor-pointer"
-                            onClick={() => setShowMenu(!showMenu)}
+                            className="w-8 h-8 rounded-full"
                         />
-                        {showMenu && (
-                            <div className="absolute right-0 mt-2 w-48 bg-gray-800 text-white rounded-lg shadow-lg z-10">
-                                <ul className="py-2">
-                                    <li
-                                        className="px-4 py-2 text-white cursor-pointer hover:bg-gray-700"
-                                        onClick={() => router.push(`/profile/${userProfile.user_id}`)}
-                                    >
-                                        Ver perfil
-                                    </li>
-                                    <li
-                                        className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-700"
-                                        onClick={() => setShowLogoutModal(true)}
-                                    >
-                                        Cerrar sesión
-                                    </li>
-                                </ul>
-                            </div>
-                        )}
-                    </div>
+                    </button>
                 )}
             </div>
 
-            {users.length > 0 ? (
-                <div className="flex gap-8 mt-8">
-                    {columns.map((column, columnIndex) => (
-                        <div key={columnIndex} className="flex flex-col gap-6">
-                            {column.map((user, index) => (
-                                <div key={index} className="flex items-center space-x-4">
-                                    <img
-                                        src={user.avatar_url || 'https://i.ibb.co/d0mWy0kP/perfildef.png'}
-                                        alt="Avatar"
-                                        className="w-16 h-16 rounded-full"
-                                    />
-                                    <div>
-                                        <h3 className="text-xl font-semibold">{user.name}</h3>
-                                        <button
-                                            onClick={() => router.push(`/profile/${user.user_id}`)}
-                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                                        >
-                                            Ver perfil
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <p className="text-gray-400 mt-4">No hay usuarios disponibles.</p>
-            )}
+            {/* Lista de todos los usuarios */}
+            <div className="mt-0 p-4">
+                {/* Título "Usuarios" en negrita y centrado */}
+                <h2 className="text-xl font-bold text-center mb-4">Usuarios</h2>
 
-            {showLogoutModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 backdrop-blur-md">
-                    <div className="bg-gray-900 text-white p-5 rounded-lg shadow-2xl text-center">
-                        <p className="mb-4 text-lg font-semibold">¿Seguro que quieres cerrar sesión?</p>
-                        <div className="flex justify-center gap-4">
-                            <button
-                                onClick={async () => {
-                                    await supabase.auth.signOut();
-                                    router.push("/");
-                                }}
-                                className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-400 transition-all"
-                            >
-                                Sí
-                            </button>
-                            <button
-                                onClick={() => setShowLogoutModal(false)}
-                                className="px-5 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-all"
-                            >
-                                No
-                            </button>
-                        </div>
-                    </div>
+                {/* Cuadrícula de usuarios */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {users.length > 0 ? (
+                        users.map((user) => (
+                            <div key={user.user_id} className="flex flex-col items-center text-center">
+                                <img
+                                    src={user.avatar_url || 'https://i.ibb.co/d0mWy0kP/perfildef.png'}
+                                    alt={user.name}
+                                    className="w-16 h-16 rounded-full mb-2"
+                                />
+                                <h3 className="text-white text-sm">{user.name}</h3>
+                                <button
+                                    onClick={() => router.push(`/profile/${user.user_id}`)}
+                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
+                                >
+                                    Ver Perfil
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-gray-400">No hay usuarios disponibles.</p>
+                    )}
                 </div>
-            )}
+            </div>
 
-            <div className="mt-8 p-4 bg-gray-900 text-center text-sm text-gray-400 fixed bottom-0 w-full">
-            <p>© 2025 by Encantia is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="noopener noreferrer">CC BY-NC-ND 4.0</a>.</p>
+            {/* Texto de licencia en la esquina inferior derecha */}
+            <div className="fixed bottom-3 right-3 text-gray-400 text-xs bg-gray-900 p-2 rounded-md shadow-md">
+                © 2025 by Encantia is licensed under CC BY-NC-ND 4.0.
             </div>
         </div>
     );
