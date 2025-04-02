@@ -1,220 +1,136 @@
-import { useState, useEffect } from "react";
-import { supabase } from "../utils/supabaseClient";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import Head from "next/head"; // Importa el componente Head de Next.js
+import { supabase } from "../utils/supabaseClient";
 
 export default function Navbar() {
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // Estado para mostrar el modal de cierre de sesión
-  const [showMenu, setShowMenu] = useState(false); // Estado para controlar el menú desplegable
-  const [mensaje, setMensaje] = useState([]); // Estado para almacenar los mensajes del usuario
-  const [loading, setLoading] = useState(true); // Estado para el estado de carga
-  const [error, setError] = useState(null); // Estado para manejar errores
-  const [userProfile, setUserProfile] = useState(null); // Estado para el perfil del usuario
-  const router = useRouter();
+    const [userProfile, setUserProfile] = useState(null);
+    const [users, setUsers] = useState([]);
+    const [messages, setMessages] = useState([]);  // Estado para almacenar los mensajes
+    const router = useRouter();
 
-  // Función para manejar el clic en la foto de perfil y abrir/cerrar el menú
-  const toggleMenu = () => setShowMenu(!showMenu);
+    // Obtener el perfil del usuario
+    const fetchUserProfile = useCallback(async () => {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) return;
 
-  // Función para obtener los mensajes para el usuario logueado
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser(); // Obtener usuario autenticado
+        const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('email', user.email)
+            .single();
 
-      if (error || !user) {
-        setError("No hay usuario autenticado.");
-        setLoading(false);
-        return;
-      }
+        if (profileData) setUserProfile(profileData);
+    }, []);
 
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('email', user.email)
-        .single();
+    // Obtener lista de usuarios
+    const fetchUsers = useCallback(async () => {
+        const { data, error } = await supabase.from('profiles').select('*');
+        if (error) {
+            console.error('Error fetching users:', error);
+        } else {
+            setUsers(data);
+        }
+    }, []);
 
-      if (profileError) {
-        setError("No se pudo obtener el perfil.");
-      } else {
-        setUserProfile(profileData);
-      }
+    // Obtener los mensajes para el usuario actual
+    const fetchMessages = useCallback(async () => {
+        if (!userProfile) return; // Asegurarse de que el perfil del usuario está cargado antes de obtener los mensajes
 
-      // Obtener los mensajes del usuario
-      const { data, error: queryError } = await supabase
-        .from("buzdvz")
-        .select("title, mensaje, created_at") // Asegúrate de obtener el campo created_at (hora de registro)
-        .eq("user_id", user.id);
+        const { data, error } = await supabase
+            .from('buzdvz')
+            .select('title, mensaje, created_at')
+            .eq('user_id', userProfile.user_id); // Buscar mensajes relacionados con el user_id del perfil actual
 
-      if (queryError) {
-        setError("No se pudieron obtener los mensajes. Intenta nuevamente más tarde.");
-      } else {
-        setMensaje(data || []); // Establecer los mensajes obtenidos
-      }
+        if (error) {
+            console.error('Error fetching messages:', error);
+        } else {
+            setMessages(data);  // Almacenar los mensajes en el estado
+        }
+    }, [userProfile]); // Reejecutar cuando se cargue el perfil del usuario
 
-      setLoading(false);
-    };
+    useEffect(() => {
+        fetchUserProfile();
+        fetchUsers(); // Obtener la lista de usuarios cuando el componente se monta
+    }, [fetchUserProfile, fetchUsers]);
 
-    fetchUserProfile();
-  }, []);
+    useEffect(() => {
+        fetchMessages();  // Obtener los mensajes cuando el perfil del usuario esté cargado
+    }, [fetchMessages]);
 
-  const handleLogout = () => setShowLogoutModal(true); // Muestra el modal de confirmación de cierre de sesión
+    const navButtons = [
+        { icon: "https://images.encantia.lat/home.png", name: "Inicio", url: '/' },
+        { icon: "https://images.encantia.lat/mensaje.png", name: "Mensajes", url: '/bdm' },
+        { icon: "https://images.encantia.lat/notas.png", name: "Notas", url: '/notes' },
+        { icon: "https://images.encantia.lat/adv.png", name: "Advertencias", url: '/advert' },
+    ];
 
-  const confirmLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/"); // Redirige al inicio después de cerrar sesión
-  };
-
-  const cancelLogout = () => setShowLogoutModal(false); // Cierra el modal sin hacer nada
-
-  // Función para formatear la fecha sin librerías externas
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  };
-
-  return (
-    <div className="flex flex-col h-screen p-4 bg-gray-900 text-white relative">
-      {/* Agregar el título en la pestaña del navegador */}
-      <Head>
-        <title>BUZON DE MENSAJES</title>
-      </Head>
-
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <img
-            src="https://images.encantia.lat/encantia-logo-2025.webp"
-            alt="Logo"
-            className="h-16"
-          />
-        </div>
-
-        <div className="flex gap-4">
-        <button
-                        onClick={() => router.push("/")}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                    >
-                        Inicio
-                    </button>      
-                    <button
-                        onClick={() => router.push("/notes")}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                    >
-                        Notas
-                    </button> 
-                    <button
-                        onClick={() => router.push("/bdm")}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                    >
-                        Buzon de mensajes
-                    </button> 
-                    <button
-                        onClick={() => router.push("/advert")}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                    >
-                        Advertencias
-                    </button> 
-                    <button
-                        onClick={() => router.push("/projects")}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                    >
-                        Proyectos
-                    </button> 
-                    <button
-                        onClick={() => router.push("/cprojects")}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors"
-                    >
-                        Crear Proyectos
-                    </button> 
-        </div>
-
-        {/* Foto de perfil */}
-        {userProfile && (
-          <div className="relative">
-            <img
-              src={userProfile.avatar_url || 'https://i.ibb.co/d0mWy0kP/perfildef.png'}
-              alt="Avatar"
-              className="w-12 h-12 rounded-full cursor-pointer"
-              onClick={toggleMenu}
-            />
-
-            {/* Menú desplegable */}
-            {showMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-gray-800 text-white rounded-lg shadow-lg z-10">
-                <ul className="py-2">
-                  <li className="px-4 py-2 text-white cursor-pointer hover:bg-gray-700" onClick={() => router.push(`/profile/${userProfile.user_id}`)}>
-                    Ver Perfil
-                  </li>
-                  <li
-                    className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-700"
-                    onClick={handleLogout}
-                  >
-                    Cerrar sesión
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Título "MENSAJES" centrado debajo de los botones */}
-      <div className="flex justify-center items-center mb-6 text-white font-bold text-3xl">
-        BUZON DE MENSAJES
-      </div>
-
-      {/* Mostrar mensajes o el estado de carga */}
-      {loading && <div className="text-white">Estamos cargando tu buzón de mensajes...</div>}
-      {error && <div className="text-red-500">{error}</div>}
-
-      {/* Mostrar los mensajes del usuario */}
-      <div className="space-y-4 mt-4">
-        {mensaje.length > 0 ? (
-          mensaje.map((msg, index) => (
-            <div key={index} className="bg-gray-800 p-4 rounded-lg">
-              <h3 className="text-xl font-semibold text-yellow-300">{msg.title}</h3> {/* Título */}
-              <p className="text-white mt-2">{msg.mensaje}</p> {/* Mensaje */}
-              <p className="text-sm text-gray-400 mt-2">
-                {/* Hora de registro */}
-                Recibido el: {msg.created_at && formatDate(msg.created_at)}
-              </p>
+    return (
+        <div className="bg-gray-900 min-h-screen">
+            {/* Texto de "Inicio" encima del navbar */}
+            <div className="absolute top-209 left-1/2 transform -translate-x-1/2 text-white font-bold text-sm">
+                Mensajes
             </div>
-          ))
-        ) : (
-          <div className="text-white">No tienes mensajes en este momento.</div>
-        )}
-      </div>
 
-      {/* Modal de confirmación de cierre de sesión */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-center">
-            <p className="text-lg mb-4">¿Estás seguro de que deseas cerrar sesión?</p>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={confirmLogout}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-400"
-              >
-                Sí
-              </button>
-              <button
-                onClick={cancelLogout}
-                className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-200"
-              >
-                No
-              </button>
+            {/* Contenedor de los mensajes con margen superior */}
+            <div className="text-white mt-0 ml-4">
+                {/* Mostrar los mensajes obtenidos */}
+                {messages.length > 0 ? (
+                    messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className="p-4 bg-gray-800 rounded-lg shadow-lg"
+                            style={{ marginBottom: '2cm' }} // Añadir un margen de 2cm entre cada mensaje
+                        >
+                            <h3 className="text-lg font-bold">{msg.title}</h3>
+                            <p>{msg.mensaje}</p>
+                            <span className="text-xs text-gray-400">{new Date(msg.created_at).toLocaleString()}</span>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-white">No tienes mensajes.</p>
+                )}
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* Pie de página */}
-      <div className="mt-8 p-4 bg-gray-900 text-center text-sm text-gray-400 fixed bottom-0 w-full">
-            <p>© 2025 by Encantia is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="noopener noreferrer">CC BY-NC-ND 4.0</a>.</p>
-      </div>
-    </div>
-  );
+            {/* Navbar de abajo */}
+            <div className="fixed bottom-3 left-1/2 transform -translate-x-1/2 flex items-center bg-gray-900 p-2 rounded-full shadow-lg space-x-4 w-max">
+                {/* Logo a la izquierda en el navbar inferior */}
+                <img
+                    src="https://images.encantia.lat/encantia-logo-2025.webp"
+                    alt="Logo"
+                    className="h-13 w-auto"
+                />
+
+                {/* Botones de navegación */}
+                {navButtons.map((button, index) => (
+                    <div key={index} className="relative group">
+                        <button
+                            onClick={() => router.push(button.url)}
+                            className="p-2 rounded-full bg-gray-800 text-white text-xl transition-transform transform group-hover:scale-110"
+                        >
+                            <img src={button.icon} alt={button.name} className="w-8 h-8" />
+                        </button>
+                        <span className="absolute bottom-14 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-gray-700 text-white text-xs rounded px-2 py-1 transition-opacity">
+                            {button.name}
+                        </span>
+                    </div>
+                ))}
+
+                {/* Avatar del usuario */}
+                {userProfile && (
+                    <button onClick={() => router.push(`/profile/${userProfile.user_id}`)} className="p-2 rounded-full bg-gray-800 text-white text-xl transition-transform transform hover:scale-110">
+                        <img
+                            src={userProfile.avatar_url || 'https://i.ibb.co/d0mWy0kP/perfildef.png'}
+                            alt="Avatar"
+                            className="w-8 h-8 rounded-full"
+                        />
+                    </button>
+                )}
+            </div>
+
+            {/* Texto de licencia en la esquina inferior derecha */}
+            <div className="fixed bottom-3 right-3 text-gray-400 text-xs bg-gray-900 p-2 rounded-md shadow-md">
+                © 2025 by Encantia is licensed under CC BY-NC-ND 4.0.
+            </div>
+        </div>
+    );
 }
