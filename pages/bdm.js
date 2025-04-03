@@ -62,6 +62,7 @@ export default function Navbar() {
         { icon: "https://images.encantia.lat/mensaje.png", name: "Mensajes", url: '/bdm' },
         { icon: "https://images.encantia.lat/notas.png", name: "Notas", url: '/notes' },
         { icon: "https://images.encantia.lat/adv.png", name: "Advertencias", url: '/advert' },
+        { icon: "https://images.encantia.lat/events.png", name: "Eventos", url: '/events' },
     ];
 
     return (
